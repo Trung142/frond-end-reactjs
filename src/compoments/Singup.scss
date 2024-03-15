@@ -1,0 +1,73 @@
+.Singup {
+    background-image: url("/images/van-hoa-barber-va-nghe-thuat-rau-toc-cho-quy-ong.jpg");
+
+    .bg-whites {
+        background-color: transparent;
+        border: 1px solid rgb(45, 60, 135);
+
+        h2,
+        strong {
+            color: white;
+        }
+    }
+
+    div {
+        position: relative;
+
+        i {
+            position: absolute;
+            top: 21px;
+            right: 10px;
+        }
+    }
+
+    span {
+        color: rgba(0, 0, 0, 0.877);
+        font-weight: bold;
+    }
+
+    .go-back {
+        text-align: center;
+
+        span {
+            color: #fff;
+            cursor: pointer;
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    .bg-whites {
+        width: 30rem;
+    }
+}
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 576px) {
+    .bg-whites {
+        width: 35rem;
+    }
+}
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) {
+    .bg-whites {
+        width: 40rem;
+    }
+}
+
+// XX-Large devices (larger desktops, 1400px and up)
+@media (min-width: 1400px) {
+    .bg-whites {
+        width: 40rem;
+    }
+}
+
+//modale
+.modal {
+    .fa-solid {
+        position: absolute;
+        top: 21px;
+        right: 10px;
+    }
+}

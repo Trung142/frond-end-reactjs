@@ -1,24 +1,16 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { useContext, useEffect } from 'react';
+import './App.scss';
+import { Router } from './Routers/routers';
+import { UserContext } from './context/Providercontext';
 function App() {
+  const { user, loginContext } = useContext(UserContext);
+  useEffect(() => {
+    if (localStorage.getItem('resdata')) {
+      loginContext(localStorage.getItem('name'), localStorage.getItem('resdata'));
+    }
+  }, [])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router />
   );
 }
 

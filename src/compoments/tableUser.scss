@@ -1,0 +1,68 @@
+table {
+    font-family: 'Courier New', Courier, monospace;
+    border-collapse: collapse;
+    width: 100%;
+
+    tr {
+
+        td,
+        th {
+            border: 1px solid rgb(224, 198, 198);
+            text-align: left;
+
+            div {
+
+
+                .fa-pen-to-square {
+                    color: rgb(255, 196, 0);
+                    margin: 0px 1rem;
+                }
+
+                .fa-pen-to-square:hover {
+                    color: white;
+                }
+
+                .fa-trash-can {
+                    color: red;
+                }
+
+                .fa-trash-can:hover {
+                    color: white;
+                }
+            }
+        }
+    }
+
+    thead {
+        tr:nth-child(1) {
+            background-color: rgb(191, 191, 51);
+        }
+    }
+
+    tbody {
+        tr:hover {
+            cursor: pointer;
+            background-color: rgb(202, 160, 160);
+            transition: 0.5s;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgb(102, 93, 93);
+        }
+    }
+
+
+}
+
+.row {
+    .add {
+        display: flex;
+        justify-content: flex-end;
+
+        button:hover {
+            cursor: pointer;
+            background-color: rgb(29, 121, 98);
+            transition: 1s;
+        }
+    }
+}

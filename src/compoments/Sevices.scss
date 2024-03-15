@@ -1,0 +1,129 @@
+.header {
+    display: flex;
+    width: 100%;
+
+    .nabar {
+        position: fixed;
+        width: 25%;
+        margin-right: 2rem;
+        height: 100vh;
+        padding: .5rem;
+        border: 1rem;
+        z-index: 1000;
+        background: rgb(222, 217, 211);
+        box-shadow: .1rem 1rem 1rem rgb(165, 173, 176);
+
+        h1 {
+            font-size: 2rem;
+            color: rgb(29, 25, 25);
+        }
+
+        ul {
+            a {
+                font-size: 1.5rem;
+                text-decoration: none;
+                color: black;
+            }
+
+            li {
+
+
+                list-style: none;
+                padding-top: 2rem;
+                border-bottom: 1px solid rgb(173, 163, 163);
+                box-shadow: .1rem 1rem 1rem rgb(182, 175, 175);
+                animation: 1s;
+            }
+
+            li:hover {
+                background: rgb(173, 163, 163);
+            }
+
+        }
+    }
+
+    .table {
+        margin-left: 26%;
+
+        .action {
+            .edit {
+                border: none;
+                background: rgb(222, 174, 16);
+                color: white;
+                margin: .1rem .2rem;
+                padding: 0 .5rem;
+                border-radius: .2rem;
+            }
+
+            .delete {
+                border: none;
+                background: rgb(211, 51, 51);
+                color: white;
+                padding: 0 1rem;
+                border-radius: .2rem;
+
+            }
+        }
+
+        .admin {
+            background: #9acd32;
+            padding: .5rem;
+            font-size: 2rem;
+            border-radius: .2rem;
+            color: white;
+            box-shadow: .1rem .2rem 1rem #9acd32;
+        }
+
+        .main {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            margin: 1rem;
+
+            .add {
+                button {
+                    background: #3c8397;
+                    color: white;
+                    font-size: 1.5rem;
+                    font-weight: bold;
+                    border: none;
+                    border-radius: 2px;
+                    box-shadow: .1rem .1rem .5rem #3c8397;
+                }
+
+                button:hover {
+                    box-shadow: .1rem .1rem 1rem #3c8397;
+                }
+
+            }
+
+            .search {
+                display: flex;
+
+                input {
+                    margin-right: 2px;
+                }
+
+                button {
+                    border: none;
+                    background: #3c8397;
+                    border-radius: 2px;
+                    color: white;
+                    font-size: 1.1rem;
+                }
+
+                button:hover {
+                    box-shadow: .1rem .4rem 1rem #3c8397;
+                }
+            }
+
+
+        }
+
+        .page {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+    }
+}

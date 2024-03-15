@@ -1,0 +1,74 @@
+.flex-warp {
+    display: flex;
+    flex-wrap: wrap;
+
+    .list-group {
+        flex: 1 1 25rem;
+    }
+
+    table {
+        tbody {
+            tr {
+                td {
+                    padding: .3rem;
+
+                    img {
+                        width: 50px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.conten {
+    padding-top: 6rem;
+    align-items: center;
+    margin: 0;
+
+    span {
+        margin-left: 1rem;
+        cursor: pointer;
+    }
+
+    .m-3 {
+        padding: 1px;
+        height: 2rem;
+    }
+}
+
+//book create
+.book {
+    width: 450px;
+    margin: 0 auto;
+    padding-top: 8rem;
+
+    .list-group-item {
+        display: flex;
+        justify-content: center;
+
+        .input-group {
+            .mb-3 {
+                margin-right: 2rem;
+
+                select {
+                    margin-right: 2rem;
+                }
+            }
+        }
+
+        .form-group {
+            width: 100%;
+
+            label {
+                width: 100%;
+            }
+        }
+    }
+}
+
+@media (max-width:768px) {
+    .book {
+        width: 350px;
+    }
+}
