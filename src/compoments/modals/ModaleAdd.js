@@ -1,9 +1,9 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import "../Singup.scss";
+import "../setting/Singup.scss";
 import { useState } from "react";
-import { valiLation } from "../../configs/js/valilation";
 import { updateUser } from '../../reviceAPI/axiosAPI';
+import { valiLation } from '../../configs/js/valilation';
 const ModaleAdd = (props) => {
     const { show, handle, hanldeUpdate } = props;
     const handleClose = () => {
@@ -11,36 +11,36 @@ const ModaleAdd = (props) => {
         handle()
     }
     const [Values, setValues] = useState({
-        name: '',
+        username: '',
         email: '',
         password: ''
     });
     const [error, setError] = useState({});
     const [showpassword, setshowPassword] = useState(false);
     const handleInput = (event) => {
-        setValues(prev => ({ ...prev, [event.target.name]: [event.target.value] }));
+        setValues(prev => ({ ...prev, [event.target.name]: event.target.value }));
     }
     const handleSave = async (event) => {
         setError(valiLation(Values));
         event.preventDefault();
-        try {
-            if (!error.name || !error.email || !error.password) {
-                const res = await updateUser(Values);
-                if (res && res.status === 200 && res.data.message === 'ok') {
+        if (Values.email && Values.password && Values.username) {
+            if (!error.email && !error.password && !error.username) {
+                let res = await updateUser(Values);
+                if (res && res.status === 200 && res.data.errCode === 0 && res.data.message.errCode === 0 && res.data.message.errMessage === 'ok') {
                     alert("Creat User success !");
-                    hanldeUpdate({ id: res.data.data.insertId, name: Values.name, email: Values.email, password: Values.password });
                     handleClose();
+                    hanldeUpdate({ id: res.data.message.insertId, username: Values.username, email: Values.email, password: Values.password });
+                } else if (res.status === 404 || res.data.errCode === 4) {
+                    alert('ten khong duoc co dau');
                 }
                 else {
-                    alert("add not success!");
-                    handleClose();
+
+                    alert(res.data.message.errMessage)
                 }
             }
-        } catch (error) {
-            console.log(error);
+        } else {
+            alert('not found');
         }
-
-
     }
     return (
         <>
@@ -53,8 +53,8 @@ const ModaleAdd = (props) => {
                         <div className="mb-3">
                             <label htmlFor="name"><strong>User name</strong></label>
                             <input className="form-control rounded"
-                                type="text" name="name" onChange={handleInput} />
-                            {error.name && <small className="text-danger">{error.name}</small>}
+                                type="text" name="username" onChange={handleInput} />
+                            {error.username && <small className="text-danger">{error.username}</small>}
                         </div>
                         <div className="mb-3">
                             <label htmlFor="email"><strong>Email</strong> </label>

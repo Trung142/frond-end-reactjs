@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import { apicreateEmployee, apicreateProduct, apicreateServices, apicreatecustomer, apiemployee } from '../../reviceAPI/axiosAPI';
+import { apicreateEmployee, apicreateProduct, apicreateServices, apicreatecustomer, deleteProducts, deleteServices, editProduct, editServices } from '../../reviceAPI/axiosAPI';
 const CreateCustomer = (props) => {
     const { show, handleClose, handleupdate } = props;
     const [firstname, setfirstname] = useState('');
@@ -258,7 +257,7 @@ const CreateEmployee = (props) => {
 }
 //products
 const CreateProduct = (props) => {
-    const { show, handleClose, handleupdate } = props;
+    const { show, handleClose, hanldeUpdate } = props;
     const [product, setproduct] = useState('');
     const [price, setprice] = useState('');
     const [quality, setquality] = useState('');
@@ -267,7 +266,7 @@ const CreateProduct = (props) => {
         product_name: product,
         description: description,
         price: price,
-        quality: quality
+        aquantity: quality
     };
     function datanull() {
         setprice('');
@@ -282,20 +281,27 @@ const CreateProduct = (props) => {
     const hanldesave = async () => {
         if (!product || !price || !description || !quality) {
             return alert("Hãy nhập đây đủ giá trị!");
+        } else {
+            let res = await apicreateProduct(values);
+            if (res && res.status === 200 && res.data.errCode === 0 && res.data.message.errCode === 0 && res.data.message.errMessage === 'ok') {
+                alert("Creat User success !");
+                hanldeUpdate({
+                    product_id: res.data.message.insertId,
+                    product_name: product,
+                    description: description,
+                    price: price,
+                    aquantity: quality
+                });
+                handleClose();
+                datanull();
+            } else if (res.status === 404 || res.data.errCode === 4) {
+                alert('ten khong duoc co dau');
+            }
+            else {
+
+                alert(res.data.message.errMessage)
+            }
         }
-        const res = await apicreateProduct(values);
-        if (res.data.message === "error server !") {
-            return alert('hãy nhập lại giá trí cho đúng !')
-        }
-        handleupdate({
-            product_id: res.data.data.insertId,
-            product_name: product,
-            description: description,
-            price: price,
-            quantity_in_stock: quality
-        });
-        handleClose();
-        datanull();
     }
     return (
         <>
@@ -309,7 +315,7 @@ const CreateProduct = (props) => {
                             <div className="form-group mr-3">
                                 <label for="input" className="col-sm-10 control-label"><b>Product name</b>:</label>
                                 <div className="col-sm-20">
-                                    <input type="email" name="" id="input"
+                                    <input type="text" name="" id="input"
                                         className="form-control" required="required" title=""
                                         value={product}
                                         onChange={(event) => setproduct(event.target.value)}
@@ -319,7 +325,7 @@ const CreateProduct = (props) => {
                             <div className="form-group mx-4">
                                 <label for="input" className="col-sm-10 control-label"><b>Price</b>:</label>
                                 <div className="col-sm-20">
-                                    <input type="email" name="" id="input"
+                                    <input type="text" name="" id="input"
                                         className="form-control" required="required" title=""
                                         value={price}
                                         onChange={(event) => setprice(event.target.value)}
@@ -329,7 +335,7 @@ const CreateProduct = (props) => {
                         </div>
                         <div className=" m-3">
                             <label for="input" className=""><b>Số lượng</b>:</label>
-                            <input type="email" name="" id="input"
+                            <input type="text" name="" id="input"
                                 className="form-control" required="required" title=""
                                 value={quality}
                                 onChange={(event) => setquality(event.target.value)}
@@ -357,42 +363,202 @@ const CreateProduct = (props) => {
         </>
     );
 }
+const ModaleDeleteProduct = (props) => {
+    const { show, handle, DeleteData, handledatadeleteUser } = props;
+    const handleClose = () => {
+        handle();
+    }
+    const handleSave = async () => {
+        const res = await deleteProducts(+DeleteData.id);
+        if (res && res.status === 200 && res.data.errCode === 0 && res.data.message.errMessage === 'ok') {
+            handledatadeleteUser(DeleteData);
+            alert("delete user success!");
+            handleClose();
+        } else if (res.status === 404 || res.data.errCode === 4) {
+            alert('ten khong duoc co dau');
+        }
+        else {
+            alert(res.data.message.errMessage);
+            handleClose();
+        }
+    }
+    return (
+        <>
+            <Modal show={show} onHide={handleClose} className='p-3'>
+                <Modal.Header closeButton>
+                    <Modal.Title>Add User</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className='container'>
+                        <span>Do yon want delete user with !</span><br />
+                        <small> ID: <strong>{DeleteData.id}</strong></small><br />
+                        <span> Tên san phẩm :<strong>{DeleteData.product_name}</strong> </span>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={() => handleSave()}>
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    )
+}
+const ModaleEditProduct = (props) => {
+    const { show, handle, dataEdit, handleEditdata } = props;
+    const [values, setValues] = useState({
+        product_name: '',
+        description: '',
+        price: '',
+        aquantity: ''
+    })
+    const handleClose = () => {
+        handle();
+    }
+    useEffect(() => {
+        if (show) {
+            setValues(
+                {
+                    ...values,
+                    product_name: dataEdit.product_name,
+                    description: dataEdit.description,
+                    price: dataEdit.price,
+                    aquantity: dataEdit.aquantity
+                }
+            )
+        }
+    }, [dataEdit])
+
+    const handleSave = async (id) => {
+        if (values.product_name && values.price && values.aquantity && values.description) {
+            let res = await editProduct(+id, values);
+            console.log(res);
+            if (res && res.status === 200 && res.data.errCode === 0 && res.data.message.errMessage === 'ok') {
+                handleEditdata({
+                    id: dataEdit.id, product_name: values.product_name, price: values.price,
+                    description: values.description,
+                    aquantity: values.aquantity
+                })
+                alert("Edit thành công!");
+                handleClose();
+            } else if (res.status === 404 || res.data.errCode === 4) {
+                alert('ten khong duoc co dau');
+            }
+            else {
+                alert(res.data.message.errMessage)
+            }
+        }
+        else {
+            alert('not found');
+        }
+    }
+    return (
+        <>
+            <Modal show={show} onHide={handleClose} className='p-3'>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit User</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className='group p-3'>
+                        <div className="input-group m-3">
+                            <div className="form-group mr-3">
+                                <label for="input" className="col-sm-10 control-label"><b>Product name</b>:</label>
+                                <div className="col-sm-20">
+                                    <input type="text" name="" id="input"
+                                        className="form-control" required="required" title=""
+                                        value={values.product_name}
+                                        onChange={(event) => setValues({ ...values, product_name: event.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group mx-4">
+                                <label for="input" className="col-sm-10 control-label"><b>Price</b>:</label>
+                                <div className="col-sm-20">
+                                    <input type="text" name="" id="input"
+                                        className="form-control" required="required" title=""
+                                        value={values.price}
+                                        onChange={(event) => setValues({ ...values, price: event.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className=" m-3">
+                            <label for="input" className=""><b>Số lượng</b>:</label>
+                            <input type="text" name="" id="input"
+                                className="form-control" required="required" title=""
+                                value={values.aquantity}
+                                onChange={(event) => setValues({ ...values, aquantity: event.target.value })}
+                            />
+                        </div>
+                        <div className=" m-3">
+                            <label for="input" className=""><b>Description</b>:</label>
+                            <input type="text" name="" id="input"
+                                className="form-control" required="required" title=""
+                                value={values.description}
+                                onChange={(event) => setValues({ ...values, description: event.target.value })}
+                            />
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={() => handleSave(dataEdit.id)}>
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    )
+}
 //services
 const CreateService = (props) => {
-    const { show, handleClose, handleupdate } = props;
-    const [servicetname, setservicename] = useState('');
+    const { show, handleClose, hanldeUpdate } = props;
+    const [service_name, setservice_name] = useState('');
     const [description, setdescription] = useState('');
     const [price, setprice] = useState('');
     const values = {
-        service_name: servicetname,
+        service_name: service_name,
         description: description,
         price: price
     };
     function datanull() {
         setprice('');
         setdescription('');
-        setservicename('');
+        setservice_name('');
+
     }
     const Close = () => {
         handleClose();
         datanull();
     }
     const hanldesave = async () => {
-        if (!price || !description || !servicetname) {
+        if (!service_name || !price || !description) {
             return alert("Hãy nhập đây đủ giá trị!");
+        } else {
+            let res = await apicreateServices(values);
+            console.log(res);
+            if (res && res.status === 200 && res.data.errCode === 0 && res.data.message.errCode === 0 && res.data.message.errMessage === 'ok') {
+                alert("Creat User success !");
+                hanldeUpdate({
+                    service_id: res.data.message.insertId,
+                    service_name: service_name,
+                    description: description,
+                    price: price
+                });
+                handleClose();
+                datanull();
+            } else if (res.status === 404 || res.data.errCode === 4) {
+                alert('ten khong duoc co dau');
+            }
+            else {
+                alert(res.data.message.errMessage)
+            }
         }
-        const res = await apicreateServices(values);
-        if (res.data.message === "error server !") {
-            return alert('hãy nhập lại giá trí cho đúng !')
-        }
-        handleupdate({
-            id: res.data.data.insertId,
-            service_name: servicetname,
-            description: description,
-            price: price
-        });
-        handleClose();
-        datanull();
     }
     return (
         <>
@@ -406,17 +572,17 @@ const CreateService = (props) => {
                             <div className="form-group mr-3">
                                 <label for="input" className="col-sm-10 control-label"><b>Service name</b>:</label>
                                 <div className="col-sm-20">
-                                    <input type="email" name="" id="input"
+                                    <input type="text" name="" id="input"
                                         className="form-control" required="required" title=""
-                                        value={servicetname}
-                                        onChange={(event) => setservicename(event.target.value)}
+                                        value={service_name}
+                                        onChange={(event) => setservice_name(event.target.value)}
                                     />
                                 </div>
                             </div>
                             <div className="form-group mx-4">
                                 <label for="input" className="col-sm-10 control-label"><b>Price</b>:</label>
                                 <div className="col-sm-20">
-                                    <input type="email" name="" id="input"
+                                    <input type="text" name="" id="input"
                                         className="form-control" placeholder='vnd' required="required" title=""
                                         value={price}
                                         onChange={(event) => setprice(event.target.value)}
@@ -446,9 +612,153 @@ const CreateService = (props) => {
         </>
     );
 }
+const ModaleDeleteService = (props) => {
+    const { show, handle, DeleteData, handledatadeleteUser } = props;
+    const handleClose = () => {
+        handle();
+    }
+    const handleSave = async () => {
+        const res = await deleteServices(+DeleteData.id);
+        if (res && res.status === 200 && res.data.errCode === 0 && res.data.message.errMessage === 'ok') {
+            handledatadeleteUser(DeleteData);
+            alert("delete user success!");
+            handleClose();
+        } else if (res.status === 404 || res.data.errCode === 4) {
+            alert('ten khong duoc co dau');
+        }
+        else {
+            alert(res.data.message.errMessage);
+            handleClose();
+        }
+    }
+    return (
+        <>
+            <Modal show={show} onHide={handleClose} className='p-3'>
+                <Modal.Header closeButton>
+                    <Modal.Title>Add User</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className='container'>
+                        <span>Do yon want delete user with !</span><br />
+                        <small> ID: <strong>{DeleteData.id}</strong></small><br />
+                        <span> Tên san phẩm :<strong>{DeleteData.service_name}</strong> </span>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={() => handleSave()}>
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    )
+}
+const ModaleEditService = (props) => {
+    const { show, handle, dataEdit, handleEditdata } = props;
+    const [values, setValues] = useState({
+        service_name: '',
+        description: '',
+        price: ''
+    })
+    const handleClose = () => {
+        handle();
+    }
+    useEffect(() => {
+        if (show) {
+            setValues(
+                {
+                    ...values,
+                    service_name: dataEdit.service_name,
+                    description: dataEdit.description,
+                    price: dataEdit.price
+                }
+            )
+        }
+    }, [dataEdit])
+
+    const handleSave = async (id) => {
+        if (values.service_name && values.price && values.description) {
+            let res = await editServices(+id, values);
+            if (res && res.status === 200 && res.data.errCode === 0 && res.data.message.errMessage === 'ok') {
+                handleEditdata({
+                    id: dataEdit.id, service_name: values.service_name, price: values.price,
+                    description: values.description
+                })
+                alert("Edit thành công!");
+                handleClose();
+            } else if (res.status === 404 || res.data.errCode === 4) {
+                alert('ten khong duoc co dau');
+            }
+            else {
+                alert(res.data.message.errMessage)
+            }
+        }
+        else {
+            alert('not found');
+        }
+    }
+    return (
+        <>
+            <Modal show={show} onHide={handleClose} className='p-3'>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit User</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className='group p-3'>
+                        <div className="input-group m-3">
+                            <div className="form-group mr-3">
+                                <label for="input" className="col-sm-10 control-label"><b>Service name</b>:</label>
+                                <div className="col-sm-20">
+                                    <input type="text" name="" id="input"
+                                        className="form-control" required="required" title=""
+                                        value={values.service_name}
+                                        onChange={(event) => setValues({ ...values, service_name: event.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group mx-4">
+                                <label for="input" className="col-sm-10 control-label"><b>Price</b>:</label>
+                                <div className="col-sm-20">
+                                    <input type="text" name="" id="input"
+                                        className="form-control" placeholder='vnd' required="required" title=""
+                                        value={values.price}
+                                        onChange={(event) => setValues({ ...values, price: event.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className=" m-3">
+                            <label for="input" className=""><b>Description</b>:</label>
+                            <input type="text" name="" id="input"
+                                className="form-control" required="required" title=""
+                                value={values.description}
+                                onChange={(event) => setValues({ ...values, description: event.target.value })}
+                            />
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={() => handleSave(dataEdit.id)}>
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    )
+}
 export {
     CreateCustomer,
     CreateEmployee,
     CreateProduct,
-    CreateService
+    ModaleDeleteProduct,
+    ModaleEditProduct,
+    CreateService,
+    ModaleDeleteService,
+    ModaleEditService
 }

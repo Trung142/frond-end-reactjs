@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react"
-import { Navbar } from "./nabav"
-import { apicreatecustomer, employees, serviecs } from "../../reviceAPI/axiosAPI";
+import { useContext, useState } from "react"
+import { apiappointment, apicreatecustomer } from "../../reviceAPI/axiosAPI";
 import { Paymodals } from "../modals/Paymodals";
+import { UserContext } from "../../context/Providercontext";
+import { Navbar } from "../nabav";
 export const Create = () => {
     const [show, setshow] = useState(false);
     const handleClose = () => {
@@ -15,7 +16,6 @@ export const Create = () => {
     const [vilist, setvilist] = useState('');
     const [employee, setemployee] = useState('');
     const [service, setservice] = useState('');
-    const [datalist, setdatalist] = useState([]);
     function datanull() {
         setname('');
         setphone('');
@@ -26,54 +26,42 @@ export const Create = () => {
         setemployee('');
         setservice('');
     }
-    //value
-    const [valueService, setvalueService] = useState([]);
-    const [valueEmployee, setvalueEmployee] = useState([]);
-    const getdata = async () => {
-        const res = await serviecs();
-        if (res.data && res.data.message === 'ok') {
-            setvalueService(res.data.data);
-        }
-    }
-    const getdata2 = async () => {
-        const res = await employees();
-        if (res.data && res.data.message === 'ok') {
-            setvalueEmployee(res.data.data);
-        }
-    }
-    useEffect(() => {
-        getdata();
-        getdata2();
-    }, [])
-    // handle update
-    const handlevalues = (id) => {
-        let listuser1 = valueService.filter((items) => items.service_id === +service);
-        let listuser2 = valueEmployee.filter((items) => items.employee_id === +employee);
-        setdatalist([{
-            value1: [].concat(listuser1, listuser2, name, email),
-            customer_id: id,
-            service_id: +service,
-            employee_id: +employee,
-            date: date
-        }]);
-    }
+    //usercontext
+    const { handlebook, valueEmployee, valueService, getappointmment, listdata } = useContext(UserContext);
     const handleCreate = async () => {
         const values = {
-            first_name: name,
+            username: name,
             email: email,
             phone: phone,
             address: vilist + "/" + address
         };
-        if (!name || !phone || !email || !date || !employee || !service) {
-            return alert('khong duoc de trong');
+        if (name && phone && email && date && employee && service) {
+            let res = await apicreatecustomer(values);
+            if (res && res.status === 200 && res.data.errCode === 0 && res.data.message.errCode === 0 && res.data.message.errMessage === 'ok') {
+                let value = {
+                    customer_id: res.data.message.insertId,
+                    employee_id: +employee,
+                    service_id: +service,
+                    date: date
+                }
+                let ress = await apiappointment(value);
+                if (ress.status === 200 && ress.data.message === 'ok') {
+                    handlebook(ress.data.data.id);
+                    setshow(true);
+                    getappointmment(ress.data.data.id);
+                    datanull();
+
+                } else {
+                    alert('create khong thnah cong');
+                }
+            }
+            else {
+                alert(res.data.message.errMessage);
+            }
+
+        } else {
+            alert('khong duoc de trong');
         }
-        const res = await apicreatecustomer(values);
-        if (res.data.message === "error server !") {
-            return alert('hãy nhập lại giá trí cho đúng !')
-        }
-        handlevalues(res.data.data.insertId)
-        setshow(true);
-        datanull();
     }
     return (
         <div className="container p-0">
@@ -133,7 +121,7 @@ export const Create = () => {
                                     {valueService && valueService.length > 0 && valueService.map((item, index) => {
                                         return (
                                             < >
-                                                <option key={index} value={item.service_id}>
+                                                <option key={index} value={item.id}>
                                                     {item.service_name}
                                                 </option>
                                             </>
@@ -155,8 +143,8 @@ export const Create = () => {
                                     {valueEmployee && valueEmployee.length > 0 && valueEmployee.map((item, index) => {
                                         return (
                                             < >
-                                                <option key={index} value={item.employee_id}>
-                                                    {item.first_name}  {item.last_name}
+                                                <option key={index} value={item.id}>
+                                                    {item.username}
                                                 </option>
                                             </>
                                         )
@@ -167,7 +155,7 @@ export const Create = () => {
                         <div className="form-group">
                             <label for="input" className="col-sm-2 control-label"><b>Chọn Ngày Giờ</b>:</label>
                             <div className="col-sm-10">
-                                <input type="date" name="" id="input"
+                                <input type="date" name="date" id="input"
                                     className="form-control" required="required" title=""
                                     value={date}
                                     onChange={(event) => setdate(event.target.value)}
@@ -211,7 +199,7 @@ export const Create = () => {
             <Paymodals
                 show={show}
                 handleClose={handleClose}
-                datalist={datalist}
+                listdata={listdata}
             />
         </div>
 

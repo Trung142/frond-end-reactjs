@@ -1,12 +1,11 @@
 import "./tableUser.scss";
 import { useEffect, useState } from "react";
 import ReactPaginate from 'react-paginate';
-import ModaleEdit from "./modals/modalEdit";
-import ModaleAdd from "./modals/ModaleAdd";
-import ModaleDelete from "./modals/modalDelete";
-import { Link, useNavigate } from "react-router-dom";
-import { Listuser } from "../reviceAPI/axiosAPI";
-const TableUser = (props) => {
+import { Link } from "react-router-dom";
+import { apiservices } from "../../reviceAPI/axiosAPI";
+import moment from "moment";
+import { CreateService, ModaleDeleteService, ModaleEditService } from "../modals/modalCreateData";
+const ManagerService = (props) => {
     const [listUser, setlistUser] = useState([]);
     //pagination
     const [totalUser, settotalUser] = useState(0);
@@ -21,11 +20,17 @@ const TableUser = (props) => {
     }, [])
     //list
     const getuser = async (page) => {
-        const res = await Listuser(page);
-        if (res && res.data.data) {
-            settotalUser(res.data.totalUser);
-            settotal_page(res.data.total_page);
-            setlistUser(res.data.data);
+        const res = await apiservices(page);
+        console.log(res);
+        if (res && res.data && res.data.errCode === 0 && res.data.message.errCode === 0 && res.data.message.errMessage === 'ok') {
+            settotalUser(res.data.message.total);
+            settotal_page(res.data.message.totalpage);
+            setlistUser(res.data.message.User);
+        } else if (res.status === 404 || res.data.errCode === 4) {
+            console.log(res);
+        }
+        else {
+            alert(res.data.message.errMessage)
         }
     }
     //hanlepage
@@ -50,9 +55,9 @@ const TableUser = (props) => {
     const handleEditdata = (user) => {
         let listuser = [...listUser];
         const index = listUser.findIndex(items => items.id === user.id);
-        listuser[index].name = user.name;
-        listuser[index].email = user.email;
-        listuser[index].password = user.password;
+        listuser[index].service_name = user.service_name;
+        listuser[index].price = user.price;
+        listuser[index].description = user.description;
         setlistUser(listuser);
     }
     //delete
@@ -73,11 +78,11 @@ const TableUser = (props) => {
                         <Link to='/'> thoát</Link>
                     </div>
                     <div className="col">
-                        <span><strong>list User </strong></span>
+                        <span><strong>list Service </strong></span>
 
                     </div>
                     <div className="col add">
-                        <button onClick={() => setShowadd(true)} className="btn btn-danger" type="">Add User</button>
+                        <button onClick={() => setShowadd(true)} className="btn btn-danger" type="">Thêm dịch vụ</button>
                     </div>
                 </div>
                 <div className="mb-3">
@@ -85,16 +90,16 @@ const TableUser = (props) => {
                         <thead>
                             <tr>
                                 <th>
-                                    ID
+                                    Tên Dịch vụ
                                 </th>
                                 <th>
-                                    Email
+                                    Chi tiết
                                 </th>
                                 <th>
-                                    Name
+                                    Giá
                                 </th>
                                 <th>
-                                    Password
+                                    Ngày Thêm
                                 </th>
                                 <th>
                                     Active
@@ -105,10 +110,10 @@ const TableUser = (props) => {
                             {listUser && listUser.length > 0 && listUser.map((items, index) => {
                                 return (
                                     <tr key={`user ${index}`}>
-                                        <td>{items.id}</td>
-                                        <td>{items.email}</td>
-                                        <td>{items.name}</td>
-                                        <td>{items.password}</td>
+                                        <td>{items.service_name}</td>
+                                        <td>{items.description}</td>
+                                        <td>{items.price}</td>
+                                        <td>{moment(items.updatedAt).format('DD/MM/YYYY hh:mm:ss')}</td>
                                         <td>
                                             <div>
                                                 <i onClick={() => handleEdit(items)} className="fa-regular fa-pen-to-square"></i>
@@ -142,25 +147,24 @@ const TableUser = (props) => {
                 containerClassName="pagination"
                 activeClassName="active"
             />
-            <ModaleAdd
+            <CreateService
                 show={showadd}
-                handle={handleClose}
+                handleClose={handleClose}
                 hanldeUpdate={hanldeUpdate}
             />
-            <ModaleDelete
+            <ModaleDeleteService
                 show={showDelete}
                 handle={handleClose}
                 DeleteData={DeleteData}
                 handledatadeleteUser={handledatadeleteUser}
             />
-            <ModaleEdit
+            <ModaleEditService
                 show={showEdit}
                 handle={handleClose}
                 dataEdit={dataEdit}
                 handleEditdata={handleEditdata}
             />
-
         </>
     )
 }
-export default TableUser;
+export default ManagerService;

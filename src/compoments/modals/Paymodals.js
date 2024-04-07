@@ -1,45 +1,35 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { apiappointment } from '../../reviceAPI/axiosAPI';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../context/Providercontext';
+import { VND } from '../vnd';
 export const Paymodals = (props) => {
-    const { show, handleClose, datalist } = props;
+    const { show, handleClose } = props;
     const [name, setname] = useState('');
     const [phone, setphone] = useState('');
     const [email, setemail] = useState('');
     const [date, setdate] = useState('');
     const [address, setaddress] = useState('');
     const [vilist, setvilist] = useState('');
-    // const [employee, setemployee] = useState('');
-    // const [service, setservice] = useState('');
-    // // handle update
+    const { listdata } = useContext(UserContext);
     const navigate = useNavigate();
-    const createappoinment = async (value) => {
-        const res = await apiappointment(value);
-        if (res.data.message === "error server !") {
-            return alert('hãy nhập lại giá trí cho đúng !');
-        }
-        alert(" Đặt lịch thành công!");
-        navigate('/history');
-    }
+    // const getappoint = async (value) => {
+    //     let id = 2;
+    //     let res = await apishowapiapoinment(id);
+    //     console.log(2);
+    //     if (res.data.message === "error server !") {
+    //         return alert('hãy nhập lại giá trí cho đúng !');
+    //     }
+    //     alert(" Đặt lịch thành công!");
+    //     navigate('/history');
+    // }
+    useEffect(() => {
+        //getappoint()
+    }, []);
     const handleSave = () => {
-
-        datalist && datalist.length > 0 && datalist.map((items) => {
-            const values = {
-                customer_id: items.customer_id,
-                employee_id: items.employee_id,
-                service_id: items.service_id,
-                appointment_date: items.date,
-                start_time: '9:00:00',
-                status: 'confirmed'
-            }
-            return createappoinment(values);
-        })
-
-
+        navigate('/history')
     }
     const handlevalues = () => {
-        console.log(datalist)
     }
     //cancel
     const handleCancel = () => {
@@ -152,32 +142,31 @@ export const Paymodals = (props) => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {datalist && datalist.length > 0 && datalist.map((items, index) => {
+                                    {listdata.data && listdata.data.length > 0 && listdata.data.map((items, index) => {
 
                                         return (
                                             <>
-                                                <tr>
-                                                    <td>
-                                                        {items.value1[2]}
+                                                <tr key={index}>
+                                                    <td >
+                                                        {items.username}
                                                     </td>
                                                     <td>
-                                                        {items.value1[1].phone_number}
+                                                        {items.phone}
                                                     </td>
                                                     <td>
-                                                        {items.value1[3]}
+                                                        {items.email}
                                                     </td>
-                                                    <td>{items.value1[0].service_name}</td>
+                                                    <td>{items.service_name}</td>
                                                     <td>
-                                                        {items.value1[1].first_name}
+                                                        {items.employee_name}
                                                     </td>
                                                     <td>
-                                                        <span>{items.value1[0].price}</span>
+                                                        {VND.format(items.price)}
                                                     </td>
                                                     <td>
                                                         <button type="button" onClick={handleSave} class="btn btn-success m-3 ">Xác nhận</button>
                                                         <button type="button" onClick={handleCancel} class="btn btn-warning m-3 ">Cancel</button>
                                                         <button type="button" onClick={handelremove} class="btn btn-danger">Remove</button>
-
                                                     </td>
                                                 </tr>
                                             </>
@@ -187,14 +176,13 @@ export const Paymodals = (props) => {
                                 </tbody>
                             </table>
                         </div>
-
                         <div className="total list-group-item">
                             <span>Tổng tiền :</span>
-                            {datalist && datalist.length > 0 && datalist.map(items => {
+                            {listdata.data && listdata.data.length > 0 && listdata.data.map(items => {
                                 return (
                                     <span>
                                         <b>
-                                            {items.value1[0].price}
+                                            {VND.format(items.price)}
                                         </b>
                                     </span>
                                 )

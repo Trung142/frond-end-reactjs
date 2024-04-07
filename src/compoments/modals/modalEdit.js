@@ -4,8 +4,8 @@ import Modal from 'react-bootstrap/Modal';
 import { editUser } from '../../reviceAPI/axiosAPI';
 const ModaleEdit = (props) => {
     const { show, handle, dataEdit, handleEditdata } = props;
-    const [valuse, setValues] = useState({
-        name: '',
+    const [values, setValues] = useState({
+        username: '',
         email: '',
         password: ''
     })
@@ -14,26 +14,30 @@ const ModaleEdit = (props) => {
     }
     useEffect(() => {
         if (show) {
-            setValues({ ...valuse, name: dataEdit.name, email: dataEdit.email, password: dataEdit.password })
+            setValues({ ...values, username: dataEdit.username, email: dataEdit.email })
         }
     }, [dataEdit])
-
     const handleSave = async (id) => {
-        const res = await editUser(id, valuse);
-        console.log('res', res);
-        if (res && res.status === 200) {
-            handleEditdata({
-                id: dataEdit.id, name: valuse.name, email: valuse.email, password: valuse.password
-            })
-            alert("Edit thành công!");
-            handleClose();
-        } else {
-            alert("lỗi edit không thành công!");
-            handleClose();
+        if (values.email && values.username) {
+            let res = await editUser(+id, values);
+            if (res && res.status === 200 && res.data.errCode === 0 && res.data.message.errMessage === 'ok') {
+                handleEditdata({
+                    id: dataEdit.id, username: values.username, email: values.email
+                })
+                alert("Edit thành công!");
+                handleClose();
+            } else if (res.status === 404 || res.data.errCode === 4) {
+                alert('ten khong duoc co dau');
+            }
+            else {
+
+                alert(res.data.message.errMessage)
+            }
         }
-
+        else {
+            alert('not found');
+        }
     }
-
     return (
         <>
             <Modal show={show} onHide={handleClose} className='p-3'>
@@ -45,20 +49,20 @@ const ModaleEdit = (props) => {
                         <div className='m-3'>
                             <label forHtml="name">User name</label>
                             <input type="text" className='form-control rounded'
-                                onChange={(event) => setValues({ ...valuse, name: event.target.value })}
-                                name="name" value={valuse.name} />
+                                onChange={(event) => setValues({ ...values, username: event.target.value })}
+                                name="username" value={values.username} />
                         </div>
                         <div className='m-3'>
                             <label forHtml="email">Email</label>
                             <input type="text" className='form-control rounded'
-                                onChange={(event) => setValues({ ...valuse, email: event.target.value })}
-                                name="email" value={valuse.email} />
+                                onChange={(event) => setValues({ ...values, email: event.target.value })}
+                                name="email" value={values.email} />
                         </div>
                         <div className='m-3'>
                             <label for="">Password</label>
                             <input type="text" className='form-control rounded'
-                                onChange={(event) => setValues({ ...valuse, password: event.target.value })}
-                                name="password" value={valuse.password} />
+                                onChange={(event) => setValues({ ...values, password: event.target.value })}
+                                name="password" value={values.password} />
                         </div>
                     </div>
 

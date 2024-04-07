@@ -7,13 +7,16 @@ const ModaleDelete = (props) => {
         handle();
     }
     const handleSave = async () => {
-        const res = await deleteUser(DeleteData.id);
-        if (res && res.status === 200) {
+        const res = await deleteUser(+DeleteData.id);
+        if (res && res.status === 200 && res.data.errCode === 0 && res.data.message.errMessage === 'ok') {
             handledatadeleteUser(DeleteData);
             alert("delete user success!");
             handleClose();
-        } else {
-            alert("error");
+        } else if (res.status === 404 || res.data.errCode === 4) {
+            alert('ten khong duoc co dau');
+        }
+        else {
+            alert(res.data.message.errMessage);
             handleClose();
         }
     }

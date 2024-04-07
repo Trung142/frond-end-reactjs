@@ -1,18 +1,17 @@
 table {
     font-family: 'Courier New', Courier, monospace;
-    border-collapse: collapse;
+    // border-collapse: collapse;
     width: 100%;
+    border: .2rem solid #c7dbd2;
 
     tr {
 
         td,
         th {
-            border: 1px solid rgb(224, 198, 198);
+            border-right: 1px solid white;
             text-align: left;
 
             div {
-
-
                 .fa-pen-to-square {
                     color: rgb(255, 196, 0);
                     margin: 0px 1rem;
@@ -34,20 +33,48 @@ table {
     }
 
     thead {
+        height: 2.5rem;
+        border-radius: 2px;
+
+        tr {
+
+            th {
+                padding: 0 2rem;
+
+                &:hover {
+                    box-shadow: .1rem .12rem .3rem #0d6efd;
+                }
+            }
+
+
+        }
+
         tr:nth-child(1) {
-            background-color: rgb(191, 191, 51);
+            background-color: #0d6efd;
+            color: #fff;
+
         }
     }
 
     tbody {
+        height: 6rem;
+
+        tr {
+
+            td {
+                padding: 0 1rem;
+                font-size: 1.2rem;
+            }
+        }
+
         tr:hover {
             cursor: pointer;
-            background-color: rgb(202, 160, 160);
+            background-color: #c7dbd2;
             transition: 0.5s;
         }
 
         tr:nth-child(even) {
-            background-color: rgb(102, 93, 93);
+            background-color: rgba(242, 242, 242, 1);
         }
     }
 
@@ -64,5 +91,12 @@ table {
             background-color: rgb(29, 121, 98);
             transition: 1s;
         }
+    }
+}
+
+.container {
+    .pagination {
+        justify-content: center;
+        align-items: center;
     }
 }

@@ -4,6 +4,15 @@
 
     .list-group {
         flex: 1 1 25rem;
+
+        .form-check {
+
+            .form-check-input,
+            .form-check-label {
+                cursor: pointer;
+            }
+        }
+
     }
 
     table {
@@ -22,7 +31,7 @@
 }
 
 .conten {
-    padding-top: 6rem;
+    padding-top: 5rem;
     align-items: center;
     margin: 0;
 

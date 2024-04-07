@@ -6,15 +6,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter } from "react-router-dom";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { UserProvider } from './context/Providercontext';
+import { ProductProvider } from './context/productProvider';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <UserProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <ProductProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ProductProvider>
     </UserProvider>
-
   </React.StrictMode>
 );
 

@@ -1,30 +1,39 @@
 import { useState } from "react";
-import { valiLation } from "../configs/js/valilation";
 import { Link, useNavigate } from "react-router-dom";
 import "./Singup.scss";
-import { updateUser } from "../reviceAPI/axiosAPI";
+import { updateUser } from "../../reviceAPI/axiosAPI";
+import { valiLation } from "../../configs/js/valilation";
 const Singup = () => {
     const navigate = useNavigate();
     const [Values, setValues] = useState({
-        name: '',
+        username: '',
         email: '',
         password: ''
     });
     const [error, setError] = useState({});
     const [showpassword, setshowPassword] = useState(false);
     const handleInput = (event) => {
-        setValues(prev => ({ ...prev, [event.target.name]: [event.target.value] }));
+        setValues(prev => ({ ...prev, [event.target.name]: event.target.value }));
     }
     const handlesignIn = async () => {
-        setError(valiLation(Values));
-        if (!error.name || !error.email || !error.password) {
-            const res = await updateUser(Values)
-            if (res && res.status === 200 && res.data.message === 'ok') {
-                navigate("/login");
-                alert("Creat User success !");
+        await setError(valiLation(Values));
+        if (Values.email && Values.password && Values.username) {
+            if (!error.email && !error.password && !error.username) {
+                let res = await updateUser(Values);
+                if (res && res.status === 200 && res.data.errCode === 0 && res.data.message.errCode === 0 && res.data.message.errMessage === 'ok') {
+                    navigate("/login");
+                    alert("Creat User success !");
+                } else if (res.status === 404 || res.data.errCode === 4) {
+                    alert('ten khong duoc co dau');
+                }
+                else {
+                    alert(res.data.message.errMessage);
+                }
             } else {
-                alert("create not success!");
+                alert('email or password not found!');
             }
+        } else {
+            alert('not found');
         }
     }
     return (
@@ -36,8 +45,8 @@ const Singup = () => {
                     <div className="mb-3">
                         <label htmlFor="name"><strong>User name</strong></label>
                         <input className="form-control rounded"
-                            type="text" name="name" onChange={handleInput} />
-                        {error.name && <small className="text-danger">{error.name}</small>}
+                            type="text" name="username" onChange={handleInput} />
+                        {error.username && <small className="text-danger">{error.username}</small>}
                     </div>
                     <div className="mb-3">
                         <label htmlFor="email"><strong>Email</strong> </label>

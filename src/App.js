@@ -3,11 +3,11 @@ import './App.scss';
 import { Router } from './Routers/routers';
 import { UserContext } from './context/Providercontext';
 function App() {
-  const { user, loginContext } = useContext(UserContext);
+  const { loginContext } = useContext(UserContext);
   useEffect(() => {
     if (localStorage.getItem('resdata')) {
-      loginContext(localStorage.getItem('name'), localStorage.getItem('resdata'));
-    }
+      loginContext(localStorage.getItem('email'), localStorage.getItem('resdata'));
+    };
   }, [])
   return (
     <Router />

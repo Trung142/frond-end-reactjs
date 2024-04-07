@@ -1,12 +1,12 @@
 import { useContext, useState } from "react";
-import { valiLation } from "../configs/js/valilation";
 import { Link, useNavigate } from "react-router-dom";
 import "./Singup.scss";
-import { login } from "../reviceAPI/axiosAPI";
-import { UserContext } from "../context/Providercontext";
+import { login } from "../../reviceAPI/axiosAPI";
+import { UserContext } from "../../context/Providercontext";
+import { valiLation } from "../../configs/js/valilation";
 const Login = () => {
     const [Values, setValues] = useState({
-        name: '',
+        email: '',
         password: ''
     });
     const { loginContext } = useContext(UserContext);
@@ -14,22 +14,28 @@ const Login = () => {
     const [error, setError] = useState({});
     const [showpassword, setshowPassword] = useState(false);
     const hanledinput = (event) => {
-        setValues(prev => ({ ...prev, [event.target.name]: [event.target.value] }))
+        setValues(prev => ({ ...prev, [event.target.name]: event.target.value.trim() }))
     }
     //signin
     const handleSupmit = async (event) => {
-        setError(valiLation(Values));
         event.preventDefault();
-        if (!error.name || !error.password) {
-            const res = await login(Values)
-            if (res && res.status === 200 && res.data.message === 'ok') {
-                loginContext(Values.name, res.data);
-                navigate("/");
-                alert("login success !");
+        setError(valiLation(Values));
+        if (Values.email && Values.password) {
+            if (!error.email && !error.password) {
+                const res = await login(Values)
+                if (res && res.status === 200 && res.data.errCode === 0 && res.data.message === 'ok') {
+                    loginContext(Values.email, res.data);
+                    navigate("/");
+                    alert("login success !");
+                }
+                else {
+                    alert(res.data.message);
+                }
+            } else {
+                alert('email or password not found!')
             }
-            else {
-                alert("password or user name Khong dung!")
-            }
+        } else {
+            alert('not found');
         }
     }
     //go back home
@@ -43,10 +49,10 @@ const Login = () => {
                     <h2 className="text-center">Log in</h2>
                     <form action="" onSubmit={handleSupmit}>
                         <div className="mb-3">
-                            <label htmlFor="name"><strong>User name</strong> </label>
+                            <label htmlFor="name"><strong>Email</strong> </label>
                             <input className="form-control rounded"
-                                type="text" name="name" onChange={(event) => hanledinput(event)} />
-                            {error.name && <small className="text-danger ">{error.name}</small>}
+                                type="text" name="email" onChange={(event) => hanledinput(event)} />
+                            {error.email && <small className="text-danger ">{error.email}</small>}
                         </div>
                         <div className="mb-3">
                             <label htmlFor="password"><strong> Password</strong></label>
